@@ -1,14 +1,17 @@
 from rest_framework import serializers
-from accounts.models import CustomUser
-
+from accounts.models import User, UserInterest
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-        fields = ['username', 'age', 'distance', 'job', 'mbti', 'hobby']
-
+        model = User
+        fields = ['username', 'nickname', 'email', 'gender', 'birth_date', 'location', 'profile_picture']
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-        fields = ['distance', 'job', 'mbti', 'hobby']
+        model = User
+        fields = ['']
+
+class InterestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserInterest
+        field = ["user", "interest"]

@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from .serializers import ProfileSerializer, ProfileUpdateSerializer
-from accounts.models import CustomUser
+from accounts.models import User
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -11,7 +11,7 @@ class ProfileView(APIView):
 
     # 조회
     def get(self, request, user_id):
-        user = CustomUser.objects.get(user_id=user_id)
+        user = User.objects.get(user_id=user_id)
         serializer = ProfileSerializer(user)
         return Response(serializer.data)
 
@@ -22,7 +22,7 @@ class ProfileView(APIView):
             return Response({'detail': '본인의 프로필만 수정할 수 있습니다.'}, status=status.HTTP_403_FORBIDDEN)
 
         # 사용자 조회
-        user = CustomUser.objects.get(user_id=user_id)
+        user = User.objects.get(user_id=user_id)
 
         # Serializer로 데이터 업데이트
         serializer = ProfileUpdateSerializer(
