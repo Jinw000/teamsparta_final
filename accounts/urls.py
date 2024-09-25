@@ -1,10 +1,14 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import UserCreateAPIView, UserUpdateAPIView, UserProfileAPIView, UserProfileImageUpdateAPIView
-
+from .views import UserCreateAPIView, UserUpdateAPIView, UserProfileAPIView, UserProfileImageUpdateAPIView, ProfileView
 app_name = 'accounts'
 
 urlpatterns = [
+    # 사용자 관리
+    # 인증 및 보안
+    # 프로필 관리
+    path("<str:username>/", ProfileView.as_view()),
+    # 관심사 관리
     # 회원가입
     path('signup/', UserCreateAPIView.as_view(), name='signup'),
     

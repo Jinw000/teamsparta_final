@@ -4,6 +4,8 @@ from rest_framework import serializers
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
+
+# 사용자 관리
 class User(AbstractUser):
     GENDER_CHOICES = [
         ('M', '남성'),
@@ -25,7 +27,8 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
+# 인증 및 보안
+# 프로필 관리
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     profile_picture = serializers.ImageField(required=False)
@@ -45,6 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
             instance.profile_picture = profile_picture
         return super().update(instance, validated_data)
 
+# 관심사 관리
 class InterestCategory(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="카테고리명")
 
@@ -70,3 +74,4 @@ class UserInterest(models.Model):
 
     def __str__(self):
         return f"{self.user.username}의 관심사: {self.interest.name}"
+    
