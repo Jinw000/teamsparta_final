@@ -27,7 +27,15 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+    
 # 인증 및 보안
+    # 임시 사용자 모델 (이메일 인증용)
+class TempUser(models.Model):
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    verification_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
 # 프로필 관리
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)

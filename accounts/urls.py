@@ -1,34 +1,34 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import UserCreateAPIView, UserUpdateAPIView, UserProfileAPIView, UserProfileImageUpdateAPIView, ProfileView
+from .views import (
+    UserLoginView,
+    UserLogoutView,
+    UserSignupView,
+    VerifyEmailView,
+    UserProfileView,
+    UserProfileUpdateView,
+    UserInfoUpdateAPIView
+)
+
 app_name = 'accounts'
 
 urlpatterns = [
     # 사용자 관리
+    path('login/', UserLoginView.as_view(), name='login'),
+    path('logout/', UserLogoutView.as_view(), name='logout'),
+
     # 인증 및 보안
+    path('signup/', UserSignupView.as_view(), name='signup'),
+    path('verify-email/', VerifyEmailView.as_view(), name='verify_email'),
+
     # 프로필 관리
-    path("<str:username>/", ProfileView.as_view()),
-    # 관심사 관리
-    # 회원가입
-    path('signup/', UserCreateAPIView.as_view(), name='signup'),
-    
-    # 프로필 수정
-    path('profile/update/', UserUpdateAPIView.as_view(), name='profile_update'),
-    
-    # 프로필 조회
-    path('profile/', UserProfileAPIView.as_view(), name='profile'),
-    
-    # JWT 토큰 (로그인)
+    path('profile/', UserProfileView.as_view(), name='profile'),
+    path('profile/<int:user_id>/', UserProfileView.as_view(), name='user_profile'),
+    path('profile/update/', UserProfileUpdateView.as_view(), name='profile_update'),
+    path('profile/update-info/', UserInfoUpdateAPIView.as_view(),
+         name='profile_update_info'),
+
+    # JWT 토큰
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
-    # 프로필 이미지 업데이트
-    path('profile/image/', UserProfileImageUpdateAPIView.as_view(), name='profile_image_update'),
-    
-    # 비밀번호 변경 (선택적)
-    # path('password/change/', PasswordChangeView.as_view(), name='password_change'),
-    
-    # 비밀번호 재설정 (선택적)
-    # path('password/reset/', PasswordResetView.as_view(), name='password_reset'),
-    # path('password/reset/confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 ]
