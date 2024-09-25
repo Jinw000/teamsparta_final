@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from .models import UserInterest
 
 User = get_user_model()
 
+
+# 사용자 관리
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     
@@ -55,3 +58,17 @@ class UserSerializer(serializers.ModelSerializer):
                 setattr(instance, attr, value)
         instance.save()
         return instance
+# 인증 및 보안
+# 프로필 관리
+class ProfileSerializer(serializers.ModelSerializer):
+    # 프로필 조회
+    class Meta:
+        model = User
+        fields = ['username', 'nickname', 'email', 'gender',
+                'birth_date', 'location', 'profile_picture']
+# 관심사 관리
+class InterestSerializer(serializers.ModelSerializer):
+    # 관심사
+    class Meta:
+        model = UserInterest
+        field = ["user", "interest"]

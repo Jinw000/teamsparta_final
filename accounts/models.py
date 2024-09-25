@@ -1,15 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from rest_framework import serializers
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
+
+# 사용자 관리
 class User(AbstractUser):
     GENDER_CHOICES = [
         ('M', '남성'),
         ('F', '여성'),
         ('O', '기타'),
     ]
-
+    
+    REQUIRED_FIELDS = ['username', 'nickname']
+    
     nickname = models.CharField(max_length=20, unique=True, verbose_name="닉네임")
     email = models.EmailField(unique=True, verbose_name="이메일")
     birth_date = models.DateField(null=True, blank=True, verbose_name="생년월일")
@@ -22,7 +27,28 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-    
+# 인증 및 보안
+# 프로필 관리
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    profile_picture = serializers.ImageField(required=False)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'nickname', 'password', 'birth_date', 'gender', 'bio', 'location', 'profile_picture']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'email': {'required': True},
+            'nickname': {'required': True},
+        }
+
+    def update(self, instance, validated_data):
+        profile_picture = validated_data.pop('profile_picture', None)
+        if profile_picture:
+            instance.profile_picture = profile_picture
+        return super().update(instance, validated_data)
+
+# 관심사 관리
 class InterestCategory(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="카테고리명")
 
@@ -48,3 +74,4 @@ class UserInterest(models.Model):
 
     def __str__(self):
         return f"{self.user.username}의 관심사: {self.interest.name}"
+    
