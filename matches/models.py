@@ -5,8 +5,8 @@ from accounts.models import User
 # 좋아요 패스 기능
 class Like(models.Model):
     # 좋아요 모델
-    user_profile = models.ForeignKey(User, on_delete=models.CASCADE)
-    liked_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile_likes')
+    liked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes_given')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
