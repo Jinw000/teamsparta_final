@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from .serializers import UserSerializer, ProfileSerializer, UserLoginSerializer, UserLocationSerializer
 from .models import User, TempUser
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
@@ -18,7 +17,7 @@ from .utils import generate_verification_code, send_verification_email
 
 
 class UserLoginView(APIView):
-    def post(self, request):
+    def get(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
         user = authenticate(request, username=username, password=password)
@@ -91,7 +90,7 @@ class VerifyEmailView(APIView):
 
 
 class UserProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, user_id=None):
         if user_id:
