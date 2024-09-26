@@ -35,25 +35,26 @@ class TempUser(models.Model):
     password = models.CharField(max_length=128)
     verification_code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
+    
 # 프로필 관리
-class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    profile_picture = serializers.ImageField(required=False)
+# class UserSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True)
+#     profile_picture = serializers.ImageField(required=False)
 
-    class Meta:
-        model = User
-        fields = ['user_id', 'username', 'email', 'nickname', 'password', 'birth_date', 'gender', 'bio', 'location', 'profile_picture']
-        extra_kwargs = {
-            'password': {'write_only': True},
-            'email': {'required': True},
-            'nickname': {'required': True},
-        }
+#     class Meta:
+#         model = User
+#         fields = ['user_id', 'username', 'email', 'nickname', 'password', 'birth_date', 'gender', 'bio', 'location', 'profile_picture']
+#         extra_kwargs = {
+#             'password': {'write_only': True},
+#             'email': {'required': True},
+#             'nickname': {'required': True},
+#         }
 
-    def update(self, instance, validated_data):
-        profile_picture = validated_data.pop('profile_picture', None)
-        if profile_picture:
-            instance.profile_picture = profile_picture
-        return super().update(instance, validated_data)
+#     def update(self, instance, validated_data):
+#         profile_picture = validated_data.pop('profile_picture', None)
+#         if profile_picture:
+#             instance.profile_picture = profile_picture
+#         return super().update(instance, validated_data)
 
 # 관심사 관리
 class InterestCategory(models.Model):
