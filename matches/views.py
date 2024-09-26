@@ -46,7 +46,7 @@ class PassView(generics.CreateAPIView):
 
         Pass, created = Pass.objects.get_or_create(
             user_profile=user_profile,
-            passed_by=request.user
+            passed_by=Pass.request.user
         )
 
         if created:
