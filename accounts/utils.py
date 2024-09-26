@@ -11,4 +11,4 @@ def send_verification_email(email, code):
     message = f'회원가입 인증 코드: {code}'
     from_email = '우리 이메일(만들예정)'
     recipient_list = [email]
-    send_mail(subject, message, from_email, recipient_list)
+    # send_mail(subject, message, from_email, recipient_list)

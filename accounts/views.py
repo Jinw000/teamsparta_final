@@ -56,7 +56,7 @@ class UserLogoutView(APIView):
 
 
 class UserSignupView(APIView):
-    def post(self, request):
+    def get(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             verification_code = generate_verification_code()
