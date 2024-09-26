@@ -15,8 +15,8 @@ class Like(models.Model):
 
 class Pass(models.Model):
     #패스 모델
-    user_profile = models.ForeignKey(User, on_delete=models.CASCADE)
-    passed_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile_passes')
+    passed_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='passes_given')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
