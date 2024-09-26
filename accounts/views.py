@@ -3,7 +3,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from .serializers import UserSerializer, ProfileSerializer, UserLoginSerializer
+from .serializers import UserSerializer, ProfileSerializer, UserLoginSerializer, UserLocationSerializer
 from .models import User, TempUser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
@@ -145,4 +145,12 @@ class UserInfoUpdateAPIView(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save()
+
+# 위치 정보 관리
+class UserLocationAPIView(generics.CreateAPIView):
+    serializer_class = UserLocationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 # 관심사 관리

@@ -7,7 +7,8 @@ from .views import (
     VerifyEmailView,
     UserProfileView,
     UserProfileUpdateView,
-    UserInfoUpdateAPIView
+    UserInfoUpdateAPIView,
+    UserLocationAPIView,
 )
 
 app_name = 'accounts'
@@ -25,8 +26,8 @@ urlpatterns = [
     path('profile/', UserProfileView.as_view(), name='profile'),
     path('profile/<int:user_id>/', UserProfileView.as_view(), name='user_profile'),
     path('profile/update/', UserProfileUpdateView.as_view(), name='profile_update'),
-    path('profile/update-info/', UserInfoUpdateAPIView.as_view(),
-         name='profile_update_info'),
+    path('profile/update-info/', UserInfoUpdateAPIView.as_view(), name='profile_update_info'),
+    path('profile/location/', UserLocationAPIView.as_view(), name='location'),
 
     # JWT 토큰
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
