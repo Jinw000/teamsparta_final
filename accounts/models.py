@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from rest_framework import serializers
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -24,6 +24,22 @@ class User(AbstractUser):
     is_verified = models.BooleanField(default=False, verbose_name="인증 여부")
     last_active = models.DateTimeField(auto_now=True, verbose_name="마지막 활동")
 
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_name='custom_user_set',
+        related_query_name='custom_user',
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name='custom_user_set',
+        related_query_name='custom_user',
+    )
     def __str__(self):
         return self.username
     
