@@ -50,6 +50,10 @@ class TempUser(models.Model):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     verification_code = models.CharField(max_length=6)
+    nickname = models.CharField(max_length=20, unique=True, null=True)
+    birth_date = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=1, choices=User.GENDER_CHOICES, null=True, blank=True)
+    bio = models.TextField(max_length=500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 # 프로필 관리
 class UserSerializer(serializers.ModelSerializer):

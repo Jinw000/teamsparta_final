@@ -64,7 +64,11 @@ class UserSignupView(APIView):
                 username=serializer.validated_data['username'],
                 email=serializer.validated_data['email'],
                 password=serializer.validated_data['password'],
-                verification_code=verification_code
+                verification_code=verification_code,
+                nickname=serializer.validated_data.get('nickname'),
+                birth_date=serializer.validated_data.get('birth_date'),
+                gender=serializer.validated_data.get('gender'),
+                bio=serializer.validated_data.get('bio')
             )
             send_verification_email(
                 serializer.validated_data['email'], verification_code)
@@ -76,14 +80,24 @@ class VerifyEmailView(APIView):
     def post(self, request):
         email = request.data.get('email')
         code = request.data.get('code')
-        temp_user = TempUser.objects.filter(
-            email=email, verification_code=code).first()
+        temp_user = TempUser.objects.filter(email=email, verification_code=code).first()
         if temp_user:
-            User.objects.create_user(
+            user = User.objects.create_user(
                 username=temp_user.username,
                 email=temp_user.email,
-                password=temp_user.password
+                password=temp_user.password,
+                nickname=temp_user.username,  # 임시로 username을 nickname으로 사용
+                is_verified=True
             )
+            # TempUser에 저장된 추가 정보가 있다면 여기서 User 객체에 추가
+            if hasattr(temp_user, 'birth_date'):
+                user.birth_date = temp_user.birth_date
+            if hasattr(temp_user, 'gender'):
+                user.gender = temp_user.gender
+            if hasattr(temp_user, 'bio'):
+                user.bio = temp_user.bio
+            user.save()
+            
             temp_user.delete()
             return Response({"message": "회원가입이 완료되었습니다."}, status=status.HTTP_201_CREATED)
         return Response({"message": "잘못된 인증 코드입니다."}, status=status.HTTP_400_BAD_REQUEST)
