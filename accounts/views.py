@@ -96,6 +96,8 @@ class VerifyEmailView(APIView):
                 user.gender = temp_user.gender
             if hasattr(temp_user, 'bio'):
                 user.bio = temp_user.bio
+            user.profile_picture = 'static/images/default_user.png'
+            
             user.save()
             
             temp_user.delete()
