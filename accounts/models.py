@@ -20,7 +20,7 @@ class User(AbstractUser):
     birth_date = models.DateField(null=True, blank=True, verbose_name="생년월일")
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name="성별")
     bio = models.TextField(max_length=500, blank=True, verbose_name="자기소개")
-    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True, verbose_name="프로필 사진")
+    profile_picture = models.ImageField(upload_to='static/images',default='static/images/default_user.png', null=True, blank=True, verbose_name="프로필 사진")
     is_verified = models.BooleanField(default=False, verbose_name="인증 여부")
     last_active = models.DateTimeField(auto_now=True, verbose_name="마지막 활동")
 
