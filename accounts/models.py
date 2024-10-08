@@ -13,7 +13,7 @@ class User(AbstractUser):
         ('O', '기타'),
     ]
     
-    REQUIRED_FIELDS = ['username', 'nickname']
+    REQUIRED_FIELDS = ['nickname']
     
     nickname = models.CharField(max_length=20, unique=True, verbose_name="닉네임")
     email = models.EmailField(unique=True, verbose_name="이메일")

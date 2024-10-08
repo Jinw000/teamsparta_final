@@ -14,6 +14,11 @@ from rest_framework_simplejwt.exceptions import TokenError
 from .utils import generate_verification_code, send_verification_email
 # Create your views here.
 
+
+# url 리다이렉트
+def home(request):
+    return render(request, 'home.html')
+
 # 사용자 관리
 
 
@@ -170,3 +175,4 @@ class UserLocationAPIView(generics.CreateAPIView):
     def get_object(self):
         return self.request.user
 # 관심사 관리
+
