@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h2 class="mb-4">회원가입</h2>
-            <form id="signupForm" method="post" action="{% url 'accounts:signup' %}">
+            <form id="signupForm" method="post" action="{% url 'accounts:api_signup' %}">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="username" class="form-label">사용자명</label>
@@ -16,12 +16,12 @@
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
                 <div class="mb-3">
-                    <label for="nickname" class="form-label">닉네임</label>
-                    <input type="text" class="form-control" id="nickname" name="nickname" required>
-                </div>
-                <div class="mb-3">
                     <label for="password" class="form-label">비밀번호</label>
                     <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="nickname" class="form-label">닉네임</label>
+                    <input type="text" class="form-control" id="nickname" name="nickname" required>
                 </div>
                 <div class="mb-3">
                     <label for="birth_date" class="form-label">생년월일</label>
@@ -39,11 +39,12 @@
                     <label for="bio" class="form-label">자기소개</label>
                     <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary" id="signupButton">가입하기</button>
+                <button type="submit" class="btn btn-primary">가입하기</button>
             </form>
 
             <div id="verificationForm" style="display: none;" class="mt-4">
                 <h3>이메일 인증</h3>
+                <p>이메일로 전송된 6자리 인증 코드를 입력해주세요.</p>
                 <div class="mb-3">
                     <label for="verification_code" class="form-label">인증 코드</label>
                     <input type="text" class="form-control" id="verification_code" name="code" required>
@@ -57,7 +58,7 @@
 <script>
 document.getElementById('signupForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    fetch("{% url 'accounts:signup' %}", {
+    fetch("{% url 'accounts:api_signup' %}", {
         method: 'POST',
         body: new FormData(this),
         headers: {
@@ -69,7 +70,7 @@ document.getElementById('signupForm').addEventListener('submit', function(e) {
         if (data.message === "인증 코드가 이메일로 전송되었습니다.") {
             alert(data.message);
             document.getElementById('verificationForm').style.display = 'block';
-            document.getElementById('signupButton').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'none';
         } else {
             alert(data.message || "오류가 발생했습니다.");
         }

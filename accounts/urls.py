@@ -9,20 +9,17 @@ from .views import (
     UserProfileUpdateView,
     UserInfoUpdateAPIView,
     UserLocationAPIView,
-    home,
 )
 
 app_name = 'accounts'
 
 urlpatterns = [
-    # frontend 관리
-    path('', home, name='home'),
     # 사용자 관리
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
 
     # 인증 및 보안
-    path('signup/', UserSignupView.as_view(), name='signup'),
+    path('api/signup/', UserSignupView.as_view(), name='api_signup'),
     path('verify-email/', VerifyEmailView.as_view(), name='verify_email'),
 
     # 프로필 관리

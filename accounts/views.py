@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.views import View
 from rest_framework.response import Response
 from .serializers import UserSerializer, ProfileSerializer, UserLoginSerializer, UserLocationSerializer
 from .models import User, TempUser
@@ -12,12 +13,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from .utils import generate_verification_code, send_verification_email
+from django.http import JsonResponse
 # Create your views here.
 
-
-# url 리다이렉트
-def home(request):
-    return render(request, 'home.html')
 
 # 사용자 관리
 
@@ -58,7 +56,6 @@ class UserLogoutView(APIView):
         except Exception as e:
             return Response({"error": "로그아웃 중 오류가 발생했습니다."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 # 인증 및 보안
-
 
 class UserSignupView(APIView):
     def post(self, request):
