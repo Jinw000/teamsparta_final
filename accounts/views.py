@@ -61,21 +61,24 @@ class UserSignupView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            verification_code = generate_verification_code()
-            TempUser.objects.create(
-                username=serializer.validated_data['username'],
-                email=serializer.validated_data['email'],
-                password=serializer.validated_data['password'],
-                verification_code=verification_code,
-                nickname=serializer.validated_data.get('nickname'),
-                birth_date=serializer.validated_data.get('birth_date'),
-                gender=serializer.validated_data.get('gender'),
-                bio=serializer.validated_data.get('bio')
-            )
-            send_verification_email(
-                serializer.validated_data['email'], verification_code)
-            return Response({"message": "인증 코드가 이메일로 전송되었습니다."}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                verification_code = generate_verification_code()
+                TempUser.objects.create(
+                    username=serializer.validated_data['username'],
+                    email=serializer.validated_data['email'],
+                    password=serializer.validated_data['password'],
+                    verification_code=verification_code,
+                    nickname=serializer.validated_data.get('nickname'),
+                    birth_date=serializer.validated_data.get('birth_date'),
+                    gender=serializer.validated_data.get('gender'),
+                    bio=serializer.validated_data.get('bio')
+                )
+                send_verification_email(
+                    serializer.validated_data['email'], verification_code)
+                return JsonResponse({"message": "인증 코드가 이메일로 전송되었습니다."}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyEmailView(APIView):
