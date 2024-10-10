@@ -16,7 +16,6 @@ from .utils import generate_verification_code, send_verification_email
 
 # 사용자 관리
 
-
 class UserLoginView(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -114,7 +113,6 @@ class VerifyEmailView(APIView):
         return Response({"message": "잘못된 인증 코드입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 # 프로필 관리
-
 
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]

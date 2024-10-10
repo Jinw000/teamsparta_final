@@ -1,7 +1,10 @@
 from django.urls import path
-from . import views
+from .views import ChatRoomMessageView, CreateOneToOneChatRoomView
 
 urlpatterns = [
-    path('room_list/<int:room_id>/', views.ChatRoomListView.as_view()),
-    path('chat_room/with/<str:user_id>/', views.CreateChatRoomView.as_view())
+    # 1:1 채팅방의 메시지 목록 및 메시지 전송
+    path('api/rooms/<int:room_id>/messages/', ChatRoomMessageView.as_view(), name='chat_room_messages'),
+
+    # 1:1 채팅방 생성
+    path('api/rooms/create/<int:user_id>/', CreateOneToOneChatRoomView.as_view(), name='create_one_to_one_chat_room'),
 ]

@@ -1,88 +1,61 @@
-from .models import ChatRoom
-from matches.models import Friend
-from rest_framework.generics import ListAPIView, CreateAPIView
-from django.shortcuts import get_object_or_404, render, redirect
-from accounts.models import User
+from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .models import ChatRoom, Message
 from rest_framework.response import Response
-
-# # 친구 요청 보내기
-
-# @login_required
-# def send_friend_request(request, to_user_id):
-#     to_user = get_object_or_404(CustomUser, id=to_user_id)
-#     if not FriendRequest.objects.filter(from_user=request.user, to_user=to_user).exists():
-#         FriendRequest.objects.create(from_user=request.user, to_user=to_user)
-#     return redirect('friend_list')
-
-# # 친구 요청 수락하기
-
-# @login_required
-# def accept_friend_request(request, request_id):
-#     friend_request = get_object_or_404(FriendRequest, id=request_id)
-#     if friend_request.to_user == request.user:
-#         friend_request.accepted = True
-#         friend_request.save()
-
-#         # 양방향 친구 관계 생성
-#         Friend.objects.create(
-#             user=request.user, friend=friend_request.from_user)
-#         Friend.objects.create(
-#             user=friend_request.from_user, friend=request.user)
-
-#     return redirect('friend_list')
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from .serializers import MessageSerializer, MessageCreateSerializer, ChatRoomSerializer
+from django.contrib.auth.models import User
 
 
-# # 친구 목록 보기
-# @login_required
-# def friend_list(request):
-#     # 사용자의 친구 목록 가져오기
-#     friends = Friend.objects.filter(user=request.user)
+# 1:1 채팅방에서 메시지 주고받기 및 조회
+class ChatRoomMessageView(APIView):
+    permission_classes = [IsAuthenticated]
 
-#     # 사용자가 받은 친구 요청 중 아직 수락되지 않은 요청 가져오기
-#     friend_requests = FriendRequest.objects.filter(
-#         to_user=request.user, accepted=False)
+    def get(self, request, room_id):
+        # 채팅방(room_id)에 로그인된 사용자가 속해 있는지 확인
+        room = get_object_or_404(ChatRoom, id=room_id)
+        if request.user not in room.participants.all():
+            return Response({"error": "You do not have permission to view this chat room."}, status=status.HTTP_403_FORBIDDEN)
 
-#     return render(request, 'friends_list.html', {
-#         'friends': friends,
-#         'friend_requests': friend_requests
-#     })
+        # 채팅방의 모든 메시지 가져오기
+        messages = Message.objects.filter(room=room).order_by('timestamp')
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def post(self, request, room_id):
+        # 채팅방(room_id)에 로그인된 사용자가 속해 있는지 확인
+        room = get_object_or_404(ChatRoom, id=room_id)
+        if request.user not in room.participants.all():
+            return Response({"error": "You do not have permission to send a message in this chat room."}, status=status.HTTP_403_FORBIDDEN)
 
-# 채팅방 목록을 보여주는 뷰
-class ChatRoomListView(ListAPIView):
+        # 메시지 생성
+        serializer = MessageCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(sender=request.user, room=room)  # 로그인한 사용자를 발신자로 설정
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def room_list(request):
-        rooms = ChatRoom.objects.all()  # 모든 채팅방을 가져옴
-    # 각 채팅방에 참가한 다른 사용자를 찾아서 저장
-        room_participants = []
-        for room in rooms:
-            other_participants = room.participants.exclude(id=request.user.id)
-            if other_participants.exists():
-                room_participants.append({
-                'room': room,
-                'other_participant': other_participants.first()  # 첫 번째 참가자를 저장
-            })
+# 1:1 채팅방 생성 뷰
+class CreateOneToOneChatRoomView(APIView):
+    permission_classes = [IsAuthenticated]
 
-        return Response(room_participants)
+    def post(self, request, user_id):
+        # 채팅 상대방을 찾음
+        other_user = get_object_or_404(User, id=user_id)
 
+        # 두 명의 사용자만 참가할 수 있는 1:1 채팅방이 이미 있는지 먼저 확인
+        room = ChatRoom.objects.filter(participants=request.user).filter(participants=other_user).first()
 
-# 친구 요청이 수락된 경우에만 채팅방 생성 또는 접근
-class CreateChatRoomView(CreateAPIView):
+        if room:
+            return Response({"message": "Chat room already exists.", "room_id": room.id}, status=status.HTTP_200_OK)
 
-    def create_or_get_chat_room(request, friend_id):
-        friend = get_object_or_404(User, id=friend_id)
-
-    # 친구 요청이 수락되었는지 확인
-        if not Friend.objects.filter(user=request.user, friend=friend).exists():
-            return redirect('friend_list')  # 친구 요청이 수락되지 않았다면 채팅방 생성 불가
-
-    # 채팅방이 이미 있으면 반환, 없으면 생성
-        room, created = ChatRoom.objects.get_or_create(
-            participants__in=[request.user, friend],
-            defaults={'name': f'{request.user.id}_{friend.id}'}
-        )
-
+        # 채팅방이 없으면 새로운 1:1 채팅방 생성
+        room = ChatRoom.objects.create(name=f"Chat between {request.user.username} and {other_user.username}")
         room.participants.add(request.user)
-        room.participants.add(friend)
+        room.participants.add(other_user)
 
-        return redirect('chat_room', room_id=room.id)
+        serializer = ChatRoomSerializer(room)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
