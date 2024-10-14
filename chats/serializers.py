@@ -7,7 +7,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'sender_username', 'content', 'timestamp']
+        fields = ['sender_username', 'content', 'timestamp']
 
 # 메시지 생성 Serializer
 class MessageCreateSerializer(serializers.ModelSerializer):

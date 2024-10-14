@@ -1,5 +1,4 @@
 from rest_framework.views import APIView
-from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import ChatRoom, Message
 from rest_framework.response import Response
@@ -7,7 +6,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from .serializers import MessageSerializer, MessageCreateSerializer, ChatRoomSerializer
-from django.contrib.auth.models import User
+from accounts.models import User
 
 
 # 1:1 채팅방에서 메시지 주고받기 및 조회
@@ -50,7 +49,7 @@ class CreateOneToOneChatRoomView(APIView):
         room = ChatRoom.objects.filter(participants=request.user).filter(participants=other_user).first()
 
         if room:
-            return Response({"message": "Chat room already exists.", "room_id": room.id}, status=status.HTTP_200_OK)
+            return Response({"message": "이미 존재하는 채팅방 입니다.", "room_id": room.id}, status=status.HTTP_200_OK)
 
         # 채팅방이 없으면 새로운 1:1 채팅방 생성
         room = ChatRoom.objects.create(name=f"Chat between {request.user.username} and {other_user.username}")

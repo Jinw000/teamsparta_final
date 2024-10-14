@@ -10,12 +10,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gpting.settings")
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 from chats.routing import websocket_urlpatterns
+from chats.auth import JWTAuthMiddlewareStack
 
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
         "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+            JWTAuthMiddlewareStack(URLRouter(websocket_urlpatterns))
         ),
     }
 )

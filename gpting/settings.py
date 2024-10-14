@@ -134,7 +134,7 @@ SIMPLE_JWT = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'UTC+9' # > timestamp 결정
 
 USE_I18N = True
 
@@ -155,10 +155,10 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],  # Redis 서버 설정
+            "hosts": [('127.0.0.1', 6379)],  # Redis 서버 설정 > 도커를 쓸건지 안쓸건지
         },
     },
-}
+} # Redis랑 channels랑 연결 > Redis를 수락받아야한다. 방식을 설정하고..
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
