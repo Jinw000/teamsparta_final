@@ -16,9 +16,9 @@ class PassSerializer(serializers.ModelSerializer):
         fields = ['user', 'passed_by', 'created_at']
 
 
-#친구 요청및 수락
+#친구 요청 및 수락
 class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
-        fields = ['id', 'from_user', 'to_user', 'status', 'created_at']
+        fields = ['id', 'from_user', 'to_user']
         read_only_fields = ['from_user', 'created_at']

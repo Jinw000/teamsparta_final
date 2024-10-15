@@ -4,9 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.views import View
 from rest_framework.response import Response
-from .serializers import UserSerializer, ProfileSerializer, UserLoginSerializer, UserLocationSerializer
+from .serializers import UserSerializer, UserLoginSerializer, UserLocationSerializer
 from .models import User, TempUser
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
@@ -18,7 +18,6 @@ from django.http import JsonResponse
 
 
 # 사용자 관리
-
 
 class UserLoginView(APIView):
     def post(self, request):
@@ -57,9 +56,13 @@ class UserLogoutView(APIView):
             return Response({"error": "유효하지 않은 토큰입니다."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": "로그아웃 중 오류가 발생했습니다."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 # 인증 및 보안
 
 class UserSignupView(APIView):
+    
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -84,6 +87,9 @@ class UserSignupView(APIView):
 
 
 class VerifyEmailView(APIView):
+    
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         email = request.data.get('email')
         code = request.data.get('code')
@@ -110,8 +116,8 @@ class VerifyEmailView(APIView):
             temp_user.delete()
             return Response({"message": "회원가입이 완료되었습니다."}, status=status.HTTP_201_CREATED)
         return Response({"message": "잘못된 인증 코드입니다."}, status=status.HTTP_400_BAD_REQUEST)
-# 프로필 관리
 
+# 프로필 관리
 
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]

@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
-
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,12 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "daphne",
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    "channels",
     "rest_framework_simplejwt.token_blacklist",
     'accounts',
     "matches",
+    "chats"
 ]
 
 MIDDLEWARE = [
@@ -81,6 +84,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'gpting.asgi.application'
 WSGI_APPLICATION = 'gpting.wsgi.application'
 
 
@@ -88,9 +92,12 @@ WSGI_APPLICATION = 'gpting.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+        "TEST": {
+            "NAME": BASE_DIR / "db.sqlite3",
+        },
     }
 }
 
@@ -114,13 +121,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=9),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'UTC' # > timestamp 결정
 
 USE_I18N = True
 
@@ -137,11 +156,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # Redis 서버 설정 > 도커를 쓸건지 안쓸건지
+        },
+    },
+} # Redis랑 channels랑 연결 > Redis를 수락받아야한다. 방식을 설정하고..
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']

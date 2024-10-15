@@ -27,4 +27,5 @@ urlpatterns = [
     path("api/matches/", include("matches.urls")),
     path('', RedirectView.as_view(url='/home/', permanent=True)),
     path('home/', include('accounts.page_urls')),
+    path("chats/",include("chats.urls"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import generics, permissions, status
+from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from accounts.models import User
 from rest_framework.response import Response
 from .models import Like, Pass, Match, FriendRequest
@@ -7,10 +8,9 @@ from .serializers import LikeSerializer, PassSerializer, FriendRequestSerializer
 # Create your views here.
 # 좋아요
 
-
 class LikeView(generics.CreateAPIView):
     serializer_class = LikeSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         user_profile_id = request.data.get('user_profile')
@@ -43,12 +43,12 @@ class LikeView(generics.CreateAPIView):
         else:
             return Response({'message': '이미 좋아요를 눌렀습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-# 패스
 
+# 패스
 
 class PassView(generics.CreateAPIView):
     serializer_class = PassSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         user_profile_id = request.data.get('user_profile')
@@ -68,10 +68,10 @@ class PassView(generics.CreateAPIView):
             return Response({'message': '이미 패스한 상대입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-#친구요청 및 수락
+#친구 요청 및 수락
 class SendFriendRequestView(generics.CreateAPIView):
     serializer_class = FriendRequestSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         to_user_id = request.data.get('to_user')
@@ -96,7 +96,7 @@ class SendFriendRequestView(generics.CreateAPIView):
 
 class RespondFriendRequestView(generics.UpdateAPIView):
     serializer_class = FriendRequestSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return FriendRequest.objects.filter(to_user=self.request.user, status='pending')
@@ -119,7 +119,7 @@ class RespondFriendRequestView(generics.UpdateAPIView):
 
 class FriendRequestListView(generics.ListAPIView):
     serializer_class = FriendRequestSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return FriendRequest.objects.filter(to_user=self.request.user, status='pending')
