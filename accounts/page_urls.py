@@ -4,6 +4,7 @@ from .page_views import (
     SignupPageView,
     LoginPageView,
     MainPageView,
+    ProfilePageView
 )
 
 app_name = 'accounts_pages'
@@ -18,4 +19,8 @@ urlpatterns = [
     
     # 로그인 페이지로 이동
     path('main/', MainPageView.as_view(), name='main_page'),
+    
+    # 프로필
+    path('profile/', ProfilePageView.as_view(), name='profile_page'),
+    path('profile/<int:user_id>/', ProfilePageView.as_view(), name='user_profile_page'),
 ]
