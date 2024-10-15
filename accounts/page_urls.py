@@ -2,7 +2,8 @@ from django.urls import path
 from .page_views import (
     home,
     SignupPageView,
-    LoginPageView
+    LoginPageView,
+    MainPageView,
 )
 
 app_name = 'accounts_pages'
@@ -16,4 +17,5 @@ urlpatterns = [
     path('login/', LoginPageView.as_view(), name='login_page'),
     
     # 로그인 페이지로 이동
+    path('main/', MainPageView.as_view(), name='main_page'),
 ]

@@ -12,3 +12,7 @@ class SignupPageView(View):
 class LoginPageView(View):
     def get(self, request):
         return render(request, 'accounts/login.html')
+
+class MainPageView(View):
+    def get(self, request):
+        return render(request, 'accounts/main.html')

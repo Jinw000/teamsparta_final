@@ -25,7 +25,7 @@
 <script>
 document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    fetch("{% url 'accounts:login' %}", {
+    fetch("{% url 'accounts:api_login' %}", {
         method: 'POST',
         body: new FormData(this),
         headers: {
@@ -34,14 +34,12 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.access) {
-            // 로그인 성공 시 로컬 스토리지에 토큰 저장
+        if (data.success) {
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
-            // main.html로 리다이렉트
-            window.location.href = "{% url 'main' %}";
+            window.location.href = "{% url 'accounts_pages:main_page' %}";
         } else {
-            alert(data.message || "로그인에 실패했습니다.");
+            alert(data.message);
         }
     })
     .catch(error => {
