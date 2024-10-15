@@ -8,3 +8,7 @@ def home(request):
 class SignupPageView(View):
     def get(self, request):
         return render(request, 'accounts/signup.html')
+
+class LoginPageView(View):
+    def get(self, request):
+        return render(request, 'accounts/login.html')

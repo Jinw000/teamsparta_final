@@ -57,6 +57,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'gpting.urls'
 
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # 이메일 직접 전송을 위한 코드 (개발후)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # 개발단계에서의 콘솔에서 출력
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail SMTP 서버 사용
+EMAIL_PORT = 587  # TLS를 위한 포트
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'gpting123@gmail.com'  # 발신 이메일 주소
+EMAIL_HOST_PASSWORD = 'gpt@1234'  # Gmail 앱 비밀번호
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

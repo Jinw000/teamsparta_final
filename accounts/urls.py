@@ -15,7 +15,7 @@ app_name = 'accounts'
 
 urlpatterns = [
     # 사용자 관리
-    path('login/', UserLoginView.as_view(), name='login'),
+    path('api/login/', UserLoginView.as_view(), name='api_login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
 
     # 인증 및 보안

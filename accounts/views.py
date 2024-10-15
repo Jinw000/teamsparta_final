@@ -27,17 +27,19 @@ class UserLoginView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             if not user.is_active:
-                return Response({"message": "회원탈퇴한 아이디입니다."}, status=status.HTTP_403_FORBIDDEN)
+                return Response({"success": False, "message": "회원탈퇴한 아이디입니다."}, status=status.HTTP_403_FORBIDDEN)
             refresh = RefreshToken.for_user(user)
             serializer = UserLoginSerializer(user)
             response_data = serializer.data
             response_data.update({
+                "success": True,
+                "message": "로그인 성공",
                 "refresh": str(refresh),
                 "access": str(refresh.access_token)
             })
             return Response(response_data, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "아이디 또는 비밀번호가 일치하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"success": False, "message": "아이디 또는 비밀번호가 일치하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogoutView(APIView):
