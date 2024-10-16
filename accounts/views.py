@@ -133,7 +133,6 @@ class UserProfileView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-
 class UserProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]

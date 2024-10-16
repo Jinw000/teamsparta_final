@@ -23,8 +23,8 @@ urlpatterns = [
     path('verify-email/', VerifyEmailView.as_view(), name='verify_email'),
 
     # 프로필 관리
-    path('profile/', UserProfileView.as_view(), name='profile'),
-    path('profile/<int:user_id>/', UserProfileView.as_view(), name='user_profile'),
+    path('api/profile/', UserProfileView.as_view(), name='api_profile'),
+    path('api/profile/<int:user_id>/', UserProfileView.as_view(), name='api_user_profile'),
     path('profile/update/', UserProfileUpdateView.as_view(), name='profile_update'),
     path('profile/update-info/', UserInfoUpdateAPIView.as_view(), name='profile_update_info'),
     path('profile/location/', UserLocationAPIView.as_view(), name='location'),
