@@ -14,7 +14,7 @@ class ChatRoom(models.Model):
 class Message(models.Model):
     room = models.ForeignKey(ChatRoom, related_name='messages', on_delete=models.CASCADE)  # 메시지가 속한 방
     sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)  # 발신자
-    message = models.TextField()  # 메시지 내용
+    content = models.TextField()  # 메시지 내용
     timestamp = models.DateTimeField(auto_now_add=True)  # 메시지 전송 시간
     is_read = models.BooleanField(default=False)  # 메시지가 읽혔는지 여부
 

@@ -25,10 +25,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data): 
-        print(1111, text_data)
         data = json.loads(text_data)
         message = data['message'] # 수신된 json에서 파이썬 형식의 메시지를 추출합니다.
 
+        room = await self.get_or_create_room(self.room_id)
+        await self.save_message(self.scope['user'], room, message)
         # # # # 메시지를 저장하고 브로드캐스트
         # print(self.scope['user'], message)
         # await self.save_message(self.scope['user'], message) # (발신자, 메시지 내용)
@@ -42,9 +43,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'sender': self.scope['user'].username,
             }
         )
-        
-        print(1111, self.scope['user'].username)
-        print(1112, self.scope['user']) #DRF와 CHANNELS 어센틱케이션
 
     async def chat_message(self, event):
         message = event['message']
@@ -55,6 +53,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'sender': sender
         }))
 
+
     @database_sync_to_async
     def get_user(self, user_id):
         return User.objects.get(id=user_id)
@@ -64,5 +63,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return ChatRoom.objects.get(id=room_id)
 
     @database_sync_to_async
-    def save_message(self, sender, content):
-        return Message.objects.get()
+    def save_message(self, sender, room, message):
+        return Message.objects.create(
+            room=room,
+            sender=sender,
+            content=message
+        )
+
+    @database_sync_to_async
+    def get_previous_messages(self, room):
+        return Message.objects.filter(room=room).order_by('timestamp')
