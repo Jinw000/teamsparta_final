@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.views.generic import TemplateView
 from .models import User
-from .serializers import UserSerializer
 
 # url 리다이렉트
 def home(request):
@@ -18,13 +17,8 @@ class LoginPageView(TemplateView):
 class MainPageView(TemplateView):
     template_name = 'accounts/main.html'
 
-class ProfilePageView(LoginRequiredMixin, View):
-    def get(self, request):
-        user = request.user
-        context = {
-            'user': UserSerializer(user).data
-        }
-        return render(request, 'accounts/profile.html', context)
+class ProfilePageView(TemplateView):
+    template_name = 'accounts/profile.html'
 
 class ProfileUpdatePageView(TemplateView):
     template_name = 'accounts/profile_update.html'

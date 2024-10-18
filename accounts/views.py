@@ -62,6 +62,7 @@ class CurrentUserView(APIView):
 
     def get(self, request):
         serializer = UserSerializer(request.user)
+        print("serializer.data: ",serializer.data)
         return Response(serializer.data)
 
 # 인증 및 보안
