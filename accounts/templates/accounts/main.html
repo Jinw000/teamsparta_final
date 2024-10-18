@@ -7,7 +7,7 @@
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
                 <div class="text-center mb-3">
-                    <img src="{{ User.profile_picture }}" alt="Profile Picture" class="rounded-circle mb-3" width="150">
+                    <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle mb-3" width="150">
                     <h4>{{ user.nickname }}</h4>
                     <p>{{ user.bio }}</p>
                 </div>
@@ -18,8 +18,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:profile_update' %}">
+                        <a class="nav-link" href="{% url 'accounts_pages:profile_update_page' %}">
                             프로필 수정
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="friendRequestsLink">
+                            친구 요청 <span class="badge bg-primary" id="friendRequestCount"></span>
                         </a>
                     </li>
                 </ul>
@@ -28,23 +33,22 @@
 
         <!-- 메인 컨텐츠 영역 -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h2 class="my-4">오늘의 추천</h2>
-            <div id="recommendedMatches" class="row">
-                <!-- 여기에 추천 매치 카드들이 동적으로 추가될 것입니다 -->
+            <h2 class="my-4">추천 프로필</h2>
+            <div id="recommendedProfiles" class="row">
+                <!-- 여기에 추천 프로필 카드들이 동적으로 추가될 것입니다 -->
             </div>
             
-            <!-- 오른쪽 사이드바 내용을 메인 영역으로 이동 -->
             <div class="row mt-4">
                 <div class="col-md-6">
-                    <h4>최근 채팅</h4>
-                    <div id="recentChats">
-                        <!-- 여기에 최근 채팅 목록이 동적으로 추가될 것입니다 -->
+                    <h4>친구 목록</h4>
+                    <div id="friendsList">
+                        <!-- 여기에 친구 목록이 동적으로 추가될 것입니다 -->
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h4>새로운 매치</h4>
-                    <div id="newMatches">
-                        <!-- 여기에 새로운 매치 목록이 동적으로 추가될 것입니다 -->
+                    <h4>최근 활동</h4>
+                    <div id="recentActivity">
+                        <!-- 여기에 최근 활동 내역이 동적으로 추가될 것입니다 -->
                     </div>
                 </div>
             </div>
@@ -52,49 +56,23 @@
     </div>
 </div>
 
-<style>
-    .sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 100;
-        padding: 48px 0 0;
-        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    }
-
-    @media (max-width: 767.98px) {
-        .sidebar {
-            top: 5rem;
-        }
-    }
-
-    .sidebar-sticky {
-        position: relative;
-        top: 0;
-        height: calc(100vh - 48px);
-        padding-top: .5rem;
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-</style>
-
 <script>
-// 추천 매치 로드
-function loadRecommendedMatches() {
-    fetch('/api/matches/recommended/')
+// 추천 프로필 로드
+function loadRecommendedProfiles() {
+    fetch('{% url "matches:recommended" %}')
         .then(response => response.json())
         .then(data => {
-            const matchesContainer = document.getElementById('recommendedMatches');
-            data.forEach(match => {
-                matchesContainer.innerHTML += `
-                    <div class="col-md-6 mb-4">
+            const profilesContainer = document.getElementById('recommendedProfiles');
+            data.forEach(profile => {
+                profilesContainer.innerHTML += `
+                    <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="${match.profile_picture}" class="card-img-top" alt="${match.nickname}">
+                            <img src="${profile.profile_picture}" class="card-img-top" alt="${profile.nickname}">
                             <div class="card-body">
-                                <h5 class="card-title">${match.nickname}</h5>
-                                <p class="card-text">${match.bio}</p>
-                                <button class="btn btn-primary" onclick="likeUser(${match.id})">좋아요</button>
+                                <h5 class="card-title">${profile.nickname}</h5>
+                                <p class="card-text">${profile.bio}</p>
+                                <button class="btn btn-primary" onclick="likeProfile(${profile.id})">좋아요</button>
+                                <button class="btn btn-secondary" onclick="passProfile(${profile.id})">패스</button>
                             </div>
                         </div>
                     </div>
@@ -103,80 +81,57 @@ function loadRecommendedMatches() {
         });
 }
 
-// 최근 채팅 로드
-function loadRecentChats() {
-    fetch('/api/chats/recent/')
-        .then(response => response.json())
-        .then(data => {
-            const chatsContainer = document.getElementById('recentChats');
-            data.forEach(chat => {
-                chatsContainer.innerHTML += `
-                    <div class="chat-item p-2 border-bottom">
-                        <strong>${chat.partner_nickname}</strong>
-                        <p>${chat.last_message}</p>
-                    </div>
-                `;
-            });
-        });
-}
-
-// 새로운 매치 로드
-function loadNewMatches() {
-    fetch('/api/matches/new/')
-        .then(response => response.json())
-        .then(data => {
-            const matchesContainer = document.getElementById('newMatches');
-            data.forEach(match => {
-                matchesContainer.innerHTML += `
-                    <div class="match-item p-2 border-bottom">
-                        <img src="${match.profile_picture}" class="rounded-circle mr-2" width="50">
-                        <span>${match.nickname}</span>
-                    </div>
-                `;
-            });
-        });
-}
-
-// 페이지 로드 시 프로필 정보를 가져오는 함수
-function loadProfileInfo() {
-    fetch('{% url "accounts:api_profile" %}', {
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('profilePicture').src = data.profile_picture;
-        document.getElementById('userNickname').textContent = data.nickname;
-        document.getElementById('userBio').textContent = data.bio;
-    })
-    .catch(error => console.error('Error:', error));
-}
-document.addEventListener('DOMContentLoaded', loadProfileInfo);
-// 페이지 로드 시 실행
-window.onload = function() {
-    loadRecommendedMatches();
-    loadRecentChats();
-    loadNewMatches();
-};
-
 // 좋아요 기능
-function likeUser(userId) {
-    fetch(`/api/matches/like/${userId}/`, {
+function likeProfile(profileId) {
+    fetch('{% url "matches:like-profile" %}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': '{{ csrf_token }}'
-        }
+        },
+        body: JSON.stringify({ user_profile: profileId })
     })
     .then(response => response.json())
     .then(data => {
-        if (data.matched) {
-            alert('새로운 매치가 성사되었습니다!');
-        } else {
-            alert('좋아요를 표시했습니다.');
-        }
+        alert(data.message);
     });
 }
+
+// 패스 기능
+function passProfile(profileId) {
+    fetch('{% url "matches:passed-profile" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ user_profile: profileId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    });
+}
+
+// 친구 요청 수 로드
+function loadFriendRequestCount() {
+    fetch('{% url "matches:friend_request_list" %}')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('friendRequestCount').textContent = data.length;
+        });
+}
+
+// 페이지 로드 시 실행
+window.onload = function() {
+    loadRecommendedProfiles();
+    loadFriendRequestCount();
+};
+
+// 친구 요청 링크 클릭 이벤트
+document.getElementById('friendRequestsLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    // 여기에 친구 요청 목록을 표시하는 모달 또는 새 페이지로 이동하는 로직을 추가할 수 있습니다.
+});
 </script>
 {% endblock %}

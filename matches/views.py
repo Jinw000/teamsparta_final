@@ -1,9 +1,11 @@
 from django.shortcuts import render
+from django.db.models import Q
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from accounts.models import User
 from rest_framework.response import Response
 from .models import Like, Pass, Match, FriendRequest
+from accounts.serializers import UserSerializer
 from .serializers import LikeSerializer, PassSerializer, FriendRequestSerializer
 # Create your views here.
 # 좋아요
@@ -17,7 +19,7 @@ class LikeView(generics.CreateAPIView):
         try:
             user_profile = User.objects.get(id=user_profile_id)
         except User.DoesNotExist:
-            return Response({'error': '유저 프로필을 찾을 수 없습니다 '}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': '유저 프로필을 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
 
         match, created = Match.objects.get_or_create(
             user1=request.user,
@@ -123,3 +125,50 @@ class FriendRequestListView(generics.ListAPIView):
 
     def get_queryset(self):
         return FriendRequest.objects.filter(to_user=self.request.user, status='pending')
+
+
+class RecommendedMatchesView(generics.ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # 사용자와 매치되지 않은 사용자들 중에서 추천
+        recommended_users = User.objects.exclude(id=user.id).exclude(
+            id__in=Match.objects.filter(user1=user).values('user2')
+        ).exclude(
+            id__in=Match.objects.filter(user2=user).values('user1')
+        )[:10]  # 예시로 10명만 추천
+        return recommended_users
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+class NewMatchesView(generics.ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # 최근에 매치된 사용자들 (상호 좋아요)
+        new_matches = Match.objects.filter(
+            (Q(user1=user) & Q(user2_likes_user1=True)) |
+            (Q(user2=user) & Q(user1_likes_user2=True)),
+            is_mutual=True
+        ).order_by('-updated_at')[:5]  # 최근 5개의 매치만 가져옴
+        
+        matched_users = []
+        for match in new_matches:
+            if match.user1 == user:
+                matched_users.append(match.user2)
+            else:
+                matched_users.append(match.user1)
+        
+        return matched_users
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
