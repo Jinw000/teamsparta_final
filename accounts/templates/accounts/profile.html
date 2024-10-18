@@ -2,61 +2,64 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>프로필</h2>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{{ user.username }}</h5>
-            <p class="card-text">이메일: {{ user.email }}</p>
-            <p class="card-text">닉네임: <span id="nickname">{{ user.nickname }}</span></p>
-            <p class="card-text">자기소개: <span id="bio">{{ user.bio }}</span></p>
-            <!-- 다른 프로필 정보 -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <img id="profilePicture" src="" class="card-img-top" alt="Profile Picture">
+                <div class="card-body text-center">
+                    <h5 id="profileNickname" class="card-title"></h5>
+                    <p id="profileBio" class="card-text"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <h2>프로필 정보</h2>
+            <table class="table">
+                <tr>
+                    <th>사용자명:</th>
+                    <td id="profileUsername"></td>
+                </tr>
+                <tr>
+                    <th>이메일:</th>
+                    <td id="profileEmail"></td>
+                </tr>
+                <tr>
+                    <th>생년월일:</th>
+                    <td id="profileBirthDate"></td>
+                </tr>
+                <tr>
+                    <th>성별:</th>
+                    <td id="profileGender"></td>
+                </tr>
+            </table>
+            <a href="{% url 'accounts_pages:profile_update_page' %}" class="btn btn-primary">프로필 수정</a>
         </div>
     </div>
-
-    <h3 class="mt-4">프로필 업데이트</h3>
-    <form id="profileUpdateForm">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="nickname" class="form-label">닉네임</label>
-            <input type="text" class="form-control" id="nicknameInput" name="nickname" value="{{ user.nickname }}">
-        </div>
-        <div class="mb-3">
-            <label for="bio" class="form-label">자기소개</label>
-            <textarea class="form-control" id="bioInput" name="bio">{{ user.bio }}</textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">업데이트</button>
-    </form>
 </div>
 
 <script>
-document.getElementById('profileUpdateForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch("{% url 'accounts:profile_update' %}", {
-        method: 'PUT',
-        body: formData,
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.nickname) {
-            document.getElementById('nickname').textContent = data.nickname;
-            document.getElementById('nicknameInput').value = data.nickname;
-        }
-        if (data.bio) {
-            document.getElementById('bio').textContent = data.bio;
-            document.getElementById('bioInput').value = data.bio;
-        }
-        alert('프로필이 성공적으로 업데이트되었습니다.');
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('프로필 업데이트 중 오류가 발생했습니다.');
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        fetch("{% url 'accounts:api_profile' %}", {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('profilePicture').src = data.profile_picture;
+            document.getElementById('profileNickname').textContent = data.nickname;
+            document.getElementById('profileBio').textContent = data.bio;
+            document.getElementById('profileUsername').textContent = data.username;
+            document.getElementById('profileEmail').textContent = data.email;
+            document.getElementById('profileBirthDate').textContent = data.birth_date || 'Not provided';
+            document.getElementById('profileGender').textContent = data.gender || 'Not provided';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 });
 </script>
 {% endblock %}

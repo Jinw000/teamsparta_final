@@ -6,10 +6,8 @@
         <!-- 왼쪽 사이드바: 프로필 정보 -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
-                <div class="text-center mb-3">
-                    <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle mb-3" width="150">
-                    <h4>{{ user.nickname }}</h4>
-                    <p>{{ user.bio }}</p>
+                <div id="userProfile" class="text-center mb-3">
+                    <!-- 사용자 프로필 정보가 여기에 동적으로 로드됩니다 -->
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -22,33 +20,28 @@
                             프로필 수정
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="friendRequestsLink">
-                            친구 요청 <span class="badge bg-primary" id="friendRequestCount"></span>
-                        </a>
-                    </li>
                 </ul>
             </div>
         </nav>
 
         <!-- 메인 컨텐츠 영역 -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h2 class="my-4">추천 프로필</h2>
-            <div id="recommendedProfiles" class="row">
-                <!-- 여기에 추천 프로필 카드들이 동적으로 추가될 것입니다 -->
+            <h2 class="my-4">오늘의 추천</h2>
+            <div id="recommendedMatches" class="row">
+                <!-- 여기에 추천 매치 카드들이 동적으로 추가될 것입니다 -->
             </div>
             
             <div class="row mt-4">
                 <div class="col-md-6">
-                    <h4>친구 목록</h4>
-                    <div id="friendsList">
-                        <!-- 여기에 친구 목록이 동적으로 추가될 것입니다 -->
+                    <h4>최근 채팅</h4>
+                    <div id="recentChats">
+                        <!-- 여기에 최근 채팅 목록이 동적으로 추가될 것입니다 -->
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h4>최근 활동</h4>
-                    <div id="recentActivity">
-                        <!-- 여기에 최근 활동 내역이 동적으로 추가될 것입니다 -->
+                    <h4>새로운 매치</h4>
+                    <div id="newMatches">
+                        <!-- 여기에 새로운 매치 목록이 동적으로 추가될 것입니다 -->
                     </div>
                 </div>
             </div>
@@ -57,81 +50,133 @@
 </div>
 
 <script>
-// 추천 프로필 로드
-function loadRecommendedProfiles() {
-    fetch('{% url "matches:recommended" %}')
+// 사용자 프로필 정보 로드
+function loadUserProfile() {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        fetch("{% url 'accounts:current_user' %}", {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
         .then(response => response.json())
         .then(data => {
-            const profilesContainer = document.getElementById('recommendedProfiles');
-            data.forEach(profile => {
-                profilesContainer.innerHTML += `
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
-                            <img src="${profile.profile_picture}" class="card-img-top" alt="${profile.nickname}">
-                            <div class="card-body">
-                                <h5 class="card-title">${profile.nickname}</h5>
-                                <p class="card-text">${profile.bio}</p>
-                                <button class="btn btn-primary" onclick="likeProfile(${profile.id})">좋아요</button>
-                                <button class="btn btn-secondary" onclick="passProfile(${profile.id})">패스</button>
-                            </div>
+            const userProfileDiv = document.getElementById('userProfile');
+            userProfileDiv.innerHTML = `
+                <img src="${data.profile_picture}" alt="Profile Picture" class="rounded-circle mb-3" width="150">
+                <h4>${data.nickname}</h4>
+                <p>${data.bio}</p>
+                <p>Username: ${data.username}</p>
+                <p>Email: ${data.email}</p>
+                <p>Birth Date: ${data.birth_date || 'Not provided'}</p>
+                <p>Gender: ${data.gender || 'Not provided'}</p>
+            `;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+}
+
+// 추천 매치 로드
+function loadRecommendedMatches() {
+    const token = localStorage.getItem('access_token');
+    fetch('/api/matches/recommended/', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const matchesContainer = document.getElementById('recommendedMatches');
+        data.forEach(match => {
+            matchesContainer.innerHTML += `
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="${match.profile_picture}" class="card-img-top" alt="${match.nickname}">
+                        <div class="card-body">
+                            <h5 class="card-title">${match.nickname}</h5>
+                            <p class="card-text">${match.bio}</p>
+                            <button class="btn btn-primary" onclick="likeUser(${match.id})">좋아요</button>
                         </div>
                     </div>
-                `;
-            });
+                </div>
+            `;
         });
+    });
+}
+
+// 최근 채팅 로드
+function loadRecentChats() {
+    const token = localStorage.getItem('access_token');
+    fetch('/api/chats/recent/', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const chatsContainer = document.getElementById('recentChats');
+        data.forEach(chat => {
+            chatsContainer.innerHTML += `
+                <div class="chat-item p-2 border-bottom">
+                    <strong>${chat.partner_nickname}</strong>
+                    <p>${chat.last_message}</p>
+                </div>
+            `;
+        });
+    });
+}
+
+// 새로운 매치 로드
+function loadNewMatches() {
+    const token = localStorage.getItem('access_token');
+    fetch('/api/matches/new/', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const matchesContainer = document.getElementById('newMatches');
+        data.forEach(match => {
+            matchesContainer.innerHTML += `
+                <div class="match-item p-2 border-bottom">
+                    <img src="${match.profile_picture}" class="rounded-circle mr-2" width="50">
+                    <span>${match.nickname}</span>
+                </div>
+            `;
+        });
+    });
 }
 
 // 좋아요 기능
-function likeProfile(profileId) {
-    fetch('{% url "matches:like-profile" %}', {
+function likeUser(userId) {
+    const token = localStorage.getItem('access_token');
+    fetch(`/api/matches/like/${userId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
             'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({ user_profile: profileId })
+        }
     })
     .then(response => response.json())
     .then(data => {
-        alert(data.message);
+        if (data.matched) {
+            alert('새로운 매치가 성사되었습니다!');
+        } else {
+            alert('좋아요를 표시했습니다.');
+        }
     });
-}
-
-// 패스 기능
-function passProfile(profileId) {
-    fetch('{% url "matches:passed-profile" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({ user_profile: profileId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-    });
-}
-
-// 친구 요청 수 로드
-function loadFriendRequestCount() {
-    fetch('{% url "matches:friend_request_list" %}')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('friendRequestCount').textContent = data.length;
-        });
 }
 
 // 페이지 로드 시 실행
-window.onload = function() {
-    loadRecommendedProfiles();
-    loadFriendRequestCount();
-};
-
-// 친구 요청 링크 클릭 이벤트
-document.getElementById('friendRequestsLink').addEventListener('click', function(e) {
-    e.preventDefault();
-    // 여기에 친구 요청 목록을 표시하는 모달 또는 새 페이지로 이동하는 로직을 추가할 수 있습니다.
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserProfile();
+    loadRecommendedMatches();
+    loadRecentChats();
+    loadNewMatches();
 });
 </script>
 {% endblock %}
