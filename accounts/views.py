@@ -2,20 +2,22 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.views import View
 from rest_framework.response import Response
-from .serializers import UserSerializer, ProfileSerializer, UserLoginSerializer, UserLocationSerializer
+from .serializers import UserSerializer, UserLoginSerializer, UserLocationSerializer
 from .models import User, TempUser
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from .utils import generate_verification_code, send_verification_email
+from django.http import JsonResponse
 # Create your views here.
 
-# 사용자 관리
 
+# 사용자 관리
 
 class UserLoginView(APIView):
     def post(self, request):
@@ -24,17 +26,19 @@ class UserLoginView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             if not user.is_active:
-                return Response({"message": "회원탈퇴한 아이디입니다."}, status=status.HTTP_403_FORBIDDEN)
+                return Response({"success": False, "message": "회원탈퇴한 아이디입니다."}, status=status.HTTP_403_FORBIDDEN)
             refresh = RefreshToken.for_user(user)
             serializer = UserLoginSerializer(user)
             response_data = serializer.data
             response_data.update({
+                "success": True,
+                "message": "로그인 성공",
                 "refresh": str(refresh),
                 "access": str(refresh.access_token)
             })
             return Response(response_data, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "아이디 또는 비밀번호가 일치하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"success": False, "message": "아이디 또는 비밀번호가 일치하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogoutView(APIView):
@@ -52,31 +56,40 @@ class UserLogoutView(APIView):
             return Response({"error": "유효하지 않은 토큰입니다."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": "로그아웃 중 오류가 발생했습니다."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 # 인증 및 보안
 
-
 class UserSignupView(APIView):
+    
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            verification_code = generate_verification_code()
-            TempUser.objects.create(
-                username=serializer.validated_data['username'],
-                email=serializer.validated_data['email'],
-                password=serializer.validated_data['password'],
-                verification_code=verification_code,
-                nickname=serializer.validated_data.get('nickname'),
-                birth_date=serializer.validated_data.get('birth_date'),
-                gender=serializer.validated_data.get('gender'),
-                bio=serializer.validated_data.get('bio')
-            )
-            send_verification_email(
-                serializer.validated_data['email'], verification_code)
-            return Response({"message": "인증 코드가 이메일로 전송되었습니다."}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                verification_code = generate_verification_code()
+                TempUser.objects.create(
+                    username=serializer.validated_data['username'],
+                    email=serializer.validated_data['email'],
+                    password=serializer.validated_data['password'],
+                    verification_code=verification_code,
+                    nickname=serializer.validated_data.get('nickname'),
+                    birth_date=serializer.validated_data.get('birth_date'),
+                    gender=serializer.validated_data.get('gender'),
+                    bio=serializer.validated_data.get('bio')
+                )
+                send_verification_email(
+                    serializer.validated_data['email'], verification_code)
+                return JsonResponse({"message": "인증 코드가 이메일로 전송되었습니다."}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyEmailView(APIView):
+    
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         email = request.data.get('email')
         code = request.data.get('code')
@@ -103,8 +116,8 @@ class VerifyEmailView(APIView):
             temp_user.delete()
             return Response({"message": "회원가입이 완료되었습니다."}, status=status.HTTP_201_CREATED)
         return Response({"message": "잘못된 인증 코드입니다."}, status=status.HTTP_400_BAD_REQUEST)
-# 프로필 관리
 
+# 프로필 관리
 
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -119,7 +132,6 @@ class UserProfileView(APIView):
 
         serializer = UserSerializer(user)
         return Response(serializer.data)
-
 
 class UserProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -170,3 +182,4 @@ class UserLocationAPIView(generics.CreateAPIView):
     def get_object(self):
         return self.request.user
 # 관심사 관리
+

@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
-
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,12 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "daphne",
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    "channels",
     "rest_framework_simplejwt.token_blacklist",
     'accounts',
     "matches",
+    "chats"
 ]
 
 MIDDLEWARE = [
@@ -57,10 +60,18 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'gpting.urls'
 
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # 이메일 직접 전송을 위한 코드 (개발후)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # 개발단계에서의 콘솔에서 출력
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail SMTP 서버 사용
+EMAIL_PORT = 587  # TLS를 위한 포트
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'gpting123@gmail.com'  # 발신 이메일 주소
+EMAIL_HOST_PASSWORD = 'gpt@1234'  # Gmail 앱 비밀번호
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,6 +84,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'gpting.asgi.application'
 WSGI_APPLICATION = 'gpting.wsgi.application'
 
 
@@ -80,9 +92,12 @@ WSGI_APPLICATION = 'gpting.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+        "TEST": {
+            "NAME": BASE_DIR / "db.sqlite3",
+        },
     }
 }
 
@@ -106,13 +121,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=9),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'UTC' # > timestamp 결정
 
 USE_I18N = True
 
@@ -129,11 +158,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # Redis 서버 설정 > 도커를 쓸건지 안쓸건지
+        },
+    },
+} # Redis랑 channels랑 연결 > Redis를 수락받아야한다. 방식을 설정하고..
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
