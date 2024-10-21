@@ -14,7 +14,7 @@ class User(AbstractUser):
         ('F', '여성'),
         ('O', '기타'),
     ]
-
+    username = None
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nickname']
 
