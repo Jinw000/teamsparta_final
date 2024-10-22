@@ -13,6 +13,18 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://1793e8b0682af307aa4b53654d5fb4f7@o4508164757389312.ingest.us.sentry.io/4508164758503424",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,6 +39,7 @@ SECRET_KEY = 'django-insecure-%-^2u=2g%a96*0kv#ew5oj!0_qan_!pqqmcpt77#@6d)7*#4ua
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    "ec2-3-34-197-104.ap-northeast-2.compute.amazonaws.com",
     "3.34.197.104",
     "localhost",
     "127.0.0.1",
@@ -157,6 +170,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / "static"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -173,5 +188,3 @@ CHANNEL_LAYERS = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
