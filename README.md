@@ -1,7 +1,9 @@
 # GPTing (지피팅) - AI 기반 소개팅 서비스
 ![image](https://github.com/user-attachments/assets/ee0fec20-ae0d-43f4-bc4d-0447d0fe1e4e)
 
-GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다. 사용자의 프로필과 대화 내용을 분석하여 최적의 매칭을 제공합니다.
+GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다. 
+
+사용자의 프로필과 대화 내용을 분석하여 최적의 매칭을 제공합니다.
 
 ## 팀 구성
 | **이름** | **역할**            | **기능**                          |
