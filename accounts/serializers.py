@@ -9,7 +9,7 @@ User = get_user_model()
 # 사용자 관리
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    
+
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'nickname', 'password', 'birth_date', 'gender', 'bio']

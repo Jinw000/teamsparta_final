@@ -92,7 +92,7 @@
     const chatLog = document.getElementById("chat-log");
     const chatMessageInput = document.getElementById("chat-message-input");
     const chatMessageSubmit = document.getElementById("chat-message-submit");
-    const currentUser = {}; // 본인의 사용자명 (로그인 정보에서 가져올 수 있음)
+    const currentUser = document.getElementById('currentUser'); // 본인의 사용자명 (로그인 정보에서 가져올 수 있음)
     const sender = document.getElementById('sender');
 
     // 서버에서 받은 메시지를 채팅창에 추가하는 함수
@@ -131,6 +131,7 @@
     });
 
         console.log(addMessageToChatLog.data);
+        
 
     // WebSocket을 사용해 실시간 메시지 수신
     const chatSocket = new WebSocket(

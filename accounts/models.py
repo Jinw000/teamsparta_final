@@ -14,8 +14,9 @@ class User(AbstractUser):
         ('F', '여성'),
         ('O', '기타'),
     ]
-    username = None
-    USERNAME_FIELD = 'email'
+
+    # username = None
+    # USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nickname']
 
     nickname = models.CharField(max_length=20, unique=True, verbose_name="닉네임")
@@ -68,7 +69,6 @@ class TempUser(models.Model):
 
 # 프로필 관리
 
-
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     profile_picture = serializers.ImageField(required=False)
@@ -76,7 +76,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['user_id', 'username', 'email', 'nickname', 'password',
-                  'birth_date', 'gender', 'bio', 'location', 'profile_picture']
+                'birth_date', 'gender', 'bio', 'location', 'profile_picture']
         extra_kwargs = {
             'password': {'write_only': True},
             'email': {'required': True},

@@ -10,6 +10,7 @@ class Like(models.Model):
     liked_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='likes_received')
     created_at = models.DateTimeField(auto_now_add=True)
 
+
     class Meta:
         unique_together = ('user_profile', 'liked_by')
 
