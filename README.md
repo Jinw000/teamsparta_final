@@ -101,128 +101,22 @@ python manage.py runserver
  1. 특정 사용자 websocket 연결 생성
 >> JS에서 django로 던지는 것을 인지하여, Postman에서 access token을 발급하고, 
 특정 사용자의 websocket 연결 생성 가능하게 함.
-
-<script>
-    const roomId = {{ room_id }};
-    const accessToken = '...';  // Postman에서 발급받은 실제 액세스 토큰 값
-    const chatLog = document.getElementById("chat-log");
-    const chatMessageInput = document.getElementById("chat-message-input");
-    const chatMessageSubmit = document.getElementById("chat-message-submit");
-
-    // WebSocket 연결 생성
-    const chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/chat/' + roomId + '/' + '?token=' + accessToken
-    );
-
-    // 서버로부터 메시지를 받을 때 호출되는 함수
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const message = data.message;
-        const sender = data.sender;
-        const timestamp = new Date().toLocaleTimeString();  // 메시지 시간을 현재 시간으로 설정
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message");
-
-        // 보낸 사람과 받는 사람에 따라 다른 스타일 적용
-        if (sender === "나") {
-            messageElement.classList.add("sent");
-        } else {
-            messageElement.classList.add("received");
-        }
-
-        messageElement.innerHTML = `<strong>${sender}:</strong> ${message}<time>${timestamp}</time>`;
-        chatLog.appendChild(messageElement);
-
-        // 자동 스크롤
-        chatLog.scrollTop = chatLog.scrollHeight;
-    };
-
-    // WebSocket 연결이 종료되었을 때
-    chatSocket.onclose = function(e) {
-        console.error('WebSocket closed unexpectedly');
-    };
-
-    // 메시지 전송 버튼 클릭 시 메시지 전송
-    chatMessageSubmit.onclick = function() {
-        const message = chatMessageInput.value;
-
-        if (message.trim() !== "") { // 빈 문자열은 메시지가 보내지지 않도록 설정
-            chatSocket.send(JSON.stringify({
-                message
-            }));
-            chatMessageInput.value = '';  // 메시지 전송 후 입력란 초기화
-        }
-    };
-
-    // Enter 키를 눌렀을 때 메시지 전송
-    chatMessageInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            chatMessageSubmit.click();
-        }
-    });
-</script>
+>> ref. chat_room.html
 ​
  
  2. 브라우저에서 새로 고침을 하여도, 채팅창 메시지가 저장되지 않는 버그가 발생
-    
-    function addMessageToChatLog(sender, message, timestamp) {
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message");
-        const timeString = new Date(timestamp).toLocaleTimeString(); // 받은 메시지의 시간을 표시
-        console.log(sender, message, timestamp);
-
-        // 보낸 사람과 받는 사람에 따라 스타일 적용
-        if (sender === currentUser) {
-            messageElement.classList.add("sent");
-        } else {
-            messageElement.classList.add("received");
-        }
-
-        messageElement.innerHTML = `<strong>${sender}:</strong> ${message} <time>${timeString}</time>`;
-        chatLog.appendChild(messageElement);
-
-        // 스크롤을 아래로 자동 이동
-        chatLog.scrollTop = chatLog.scrollHeight;
-    }
-
-    // 서버에서 기존 메시지를 불러와 채팅창에 추가
-    fetch(`http://127.0.0.1:8000/api/chats/api/rooms/${roomId}/messages/`, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-})
-    .then(response => response.json())
-    .then(messages => {
-        messages.forEach(message => {
-            console.log(message);
-            addMessageToChatLog(message.sender_username, message.content, message.timestamp);
-        });
-    });
-
-        console.log(addMessageToChatLog.data);
 ​
->> fetch 함수를 사용하여, 기존의 메시지를 불러와 채팅창에 추가
+>> fetch 함수를 사용하여, 기존의 메시지를 불러와 채팅창에 추가 (ref. chat_room.html)
 
 
  3. channels 서버 호환 문제
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],  # Redis 서버 설정 > 도커를 쓸건지 안쓸건지
-        },
-    },
-} # Redis랑 channels랑 연결 > Redis를 수락받아야한다. 방식을 설정하고..
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 ​
->> localhost, 6379를 사용하기 위해 Docker를 활용하여 해결
+>> localhost, 6379를 사용하기 위해 Docker를 활용하여 해결 (ref. gpting/settings.py)
+>> channels_layer 참고
 
 
  4. 로그인한 사용자는 오른쪽, 상대방은 왼쪽에 나타나게 하는 방법 해결
+    
  - 프론트엔드 부분 수정
 chat-log에서 flex-direction: column, display: flex로 변경
 text-align에서 align-self: end, start로 변경
@@ -253,9 +147,3 @@ text-align에서 align-self: end, start로 변경
             background-color: #fff;
             border: 1px solid #ddd;
             align-self: start;
-
-
-
-
-
-
