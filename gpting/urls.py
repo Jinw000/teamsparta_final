@@ -25,7 +25,7 @@ def trigger_error(request):
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/accounts/", include("accounts.urls")),
-    # path("accounts/", include("accounts.page_urls")),
+    path("accounts/", include("accounts.page_urls")),
     path("api/matches/", include("matches.urls")),
     path('', RedirectView.as_view(url='/home/', permanent=True)),
     path('home/', include('accounts.page_urls')),
