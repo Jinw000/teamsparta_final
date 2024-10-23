@@ -44,6 +44,7 @@ git clone https://github.com/Jinw000/teamsparta_final.git
 3. 가상 환경 생성 및 활성화
 
 python -m venv venv
+
 source venv/bin/activate # Windows: venv\Scripts\activate
 
 5. 페키지 설치
@@ -54,6 +55,7 @@ pip install -r requirements.txt
 6. 데이터베이스 마이그레이션 및 서버 실행
 
 python manage.py migrate
+
 python manage.py runserver
 
 ## 보안
