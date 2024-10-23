@@ -99,8 +99,10 @@ python manage.py runserver
 
 ## 트러블 슈팅
  1. 특정 사용자 websocket 연결 생성
+    
 >> JS에서 django로 던지는 것을 인지하여, Postman에서 access token을 발급하고, 
 특정 사용자의 websocket 연결 생성 가능하게 함.
+
 >> ref. chat_room.html
 ​
  
@@ -112,7 +114,7 @@ python manage.py runserver
  3. channels 서버 호환 문제
 ​
 >> localhost, 6379를 사용하기 위해 Docker를 활용하여 해결 (ref. gpting/settings.py)
->> channels_layer 참고
+>> channels_layer
 
 
  4. 로그인한 사용자는 오른쪽, 상대방은 왼쪽에 나타나게 하는 방법 해결
