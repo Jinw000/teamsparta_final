@@ -23,7 +23,6 @@ GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다. 사용자의 
 ## 기술 스택
 
 - Backend: Django, Django REST Framework
-- Frontend: HTML, CSS, JavaScript
 - Database: PostgreSQL
 - AI/ML: OpenAI GPT
 - 인증: JWT (JSON Web Tokens)
