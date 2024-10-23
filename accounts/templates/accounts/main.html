@@ -6,10 +6,8 @@
         <!-- 왼쪽 사이드바: 프로필 정보 -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
-                <div class="text-center mb-3">
-                    <img src="{{ User.profile_picture }}" alt="Profile Picture" class="rounded-circle mb-3" width="150">
-                    <h4>{{ user.nickname }}</h4>
-                    <p>{{ user.bio }}</p>
+                <div id="userProfile" class="text-center mb-3">
+                    <!-- 사용자 프로필 정보가 여기에 동적으로 로드됩니다 -->
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -18,7 +16,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:profile_update' %}">
+                        <a class="nav-link" href="{% url 'accounts_pages:profile_update_page' %}">
                             프로필 수정
                         </a>
                     </li>
@@ -33,7 +31,6 @@
                 <!-- 여기에 추천 매치 카드들이 동적으로 추가될 것입니다 -->
             </div>
             
-            <!-- 오른쪽 사이드바 내용을 메인 영역으로 이동 -->
             <div class="row mt-4">
                 <div class="col-md-6">
                     <h4>최근 채팅</h4>
@@ -52,120 +49,115 @@
     </div>
 </div>
 
-<style>
-    .sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 100;
-        padding: 48px 0 0;
-        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    }
-
-    @media (max-width: 767.98px) {
-        .sidebar {
-            top: 5rem;
-        }
-    }
-
-    .sidebar-sticky {
-        position: relative;
-        top: 0;
-        height: calc(100vh - 48px);
-        padding-top: .5rem;
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-</style>
-
 <script>
+// 사용자 프로필 정보 로드
+function loadUserProfile() {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        fetch("{% url 'accounts:current_user' %}", {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const userProfileDiv = document.getElementById('userProfile');
+            userProfileDiv.innerHTML = `
+                <img src="${data.profile_picture}" alt="Profile Picture" class="rounded-circle mb-3" width="150">
+                <h4>${data.nickname}</h4>
+                <p>${data.bio}</p>
+                <p>Username: ${data.username}</p>
+                <p>Email: ${data.email}</p>
+                <p>Birth Date: ${data.birth_date || 'Not provided'}</p>
+                <p>Gender: ${data.gender || 'Not provided'}</p>
+            `;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+}
+
 // 추천 매치 로드
 function loadRecommendedMatches() {
-    fetch('/api/matches/recommended/')
-        .then(response => response.json())
-        .then(data => {
-            const matchesContainer = document.getElementById('recommendedMatches');
-            data.forEach(match => {
-                matchesContainer.innerHTML += `
-                    <div class="col-md-6 mb-4">
-                        <div class="card">
-                            <img src="${match.profile_picture}" class="card-img-top" alt="${match.nickname}">
-                            <div class="card-body">
-                                <h5 class="card-title">${match.nickname}</h5>
-                                <p class="card-text">${match.bio}</p>
-                                <button class="btn btn-primary" onclick="likeUser(${match.id})">좋아요</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        });
-}
-
-// 최근 채팅 로드
-function loadRecentChats() {
-    fetch('/api/chats/recent/')
-        .then(response => response.json())
-        .then(data => {
-            const chatsContainer = document.getElementById('recentChats');
-            data.forEach(chat => {
-                chatsContainer.innerHTML += `
-                    <div class="chat-item p-2 border-bottom">
-                        <strong>${chat.partner_nickname}</strong>
-                        <p>${chat.last_message}</p>
-                    </div>
-                `;
-            });
-        });
-}
-
-// 새로운 매치 로드
-function loadNewMatches() {
-    fetch('/api/matches/new/')
-        .then(response => response.json())
-        .then(data => {
-            const matchesContainer = document.getElementById('newMatches');
-            data.forEach(match => {
-                matchesContainer.innerHTML += `
-                    <div class="match-item p-2 border-bottom">
-                        <img src="${match.profile_picture}" class="rounded-circle mr-2" width="50">
-                        <span>${match.nickname}</span>
-                    </div>
-                `;
-            });
-        });
-}
-
-// 페이지 로드 시 프로필 정보를 가져오는 함수
-function loadProfileInfo() {
-    fetch('{% url "accounts:api_profile" %}', {
+    const token = localStorage.getItem('access_token');
+    fetch('/api/matches/recommended/', {
         headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            'Authorization': `Bearer ${token}`
         }
     })
     .then(response => response.json())
     .then(data => {
-        document.getElementById('profilePicture').src = data.profile_picture;
-        document.getElementById('userNickname').textContent = data.nickname;
-        document.getElementById('userBio').textContent = data.bio;
-    })
-    .catch(error => console.error('Error:', error));
+        const matchesContainer = document.getElementById('recommendedMatches');
+        data.forEach(match => {
+            matchesContainer.innerHTML += `
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="${match.profile_picture}" class="card-img-top" alt="${match.nickname}">
+                        <div class="card-body">
+                            <h5 class="card-title">${match.nickname}</h5>
+                            <p class="card-text">${match.bio}</p>
+                            <button class="btn btn-primary" onclick="likeUser(${match.id})">좋아요</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    });
 }
-document.addEventListener('DOMContentLoaded', loadProfileInfo);
-// 페이지 로드 시 실행
-window.onload = function() {
-    loadRecommendedMatches();
-    loadRecentChats();
-    loadNewMatches();
-};
+
+// 최근 채팅 로드
+function loadRecentChats() {
+    const token = localStorage.getItem('access_token');
+    fetch('/api/chats/recent/', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const chatsContainer = document.getElementById('recentChats');
+        data.forEach(chat => {
+            chatsContainer.innerHTML += `
+                <div class="chat-item p-2 border-bottom">
+                    <strong>${chat.partner_nickname}</strong>
+                    <p>${chat.last_message}</p>
+                </div>
+            `;
+        });
+    });
+}
+
+// 새로운 매치 로드
+function loadNewMatches() {
+    const token = localStorage.getItem('access_token');
+    fetch('/api/matches/new/', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const matchesContainer = document.getElementById('newMatches');
+        data.forEach(match => {
+            matchesContainer.innerHTML += `
+                <div class="match-item p-2 border-bottom">
+                    <img src="${match.profile_picture}" class="rounded-circle mr-2" width="50">
+                    <span>${match.nickname}</span>
+                </div>
+            `;
+        });
+    });
+}
 
 // 좋아요 기능
 function likeUser(userId) {
+    const token = localStorage.getItem('access_token');
     fetch(`/api/matches/like/${userId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
             'X-CSRFToken': '{{ csrf_token }}'
         }
     })
@@ -178,5 +170,13 @@ function likeUser(userId) {
         }
     });
 }
+
+// 페이지 로드 시 실행
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserProfile();
+    loadRecommendedMatches();
+    loadRecentChats();
+    loadNewMatches();
+});
 </script>
 {% endblock %}

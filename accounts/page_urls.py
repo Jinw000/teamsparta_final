@@ -4,7 +4,9 @@ from .page_views import (
     LoginPageView,
     MainPageView,
     ProfilePageView,
+    ProfileUpdatePageView
     HomePageView
+
 )
 
 app_name = 'accounts_pages'
@@ -22,5 +24,6 @@ urlpatterns = [
     
     # 프로필
     path('profile/', ProfilePageView.as_view(), name='profile_page'),
+    path('profile-update/', ProfileUpdatePageView.as_view(), name='profile_update_page'),
     path('profile/<int:user_id>/', ProfilePageView.as_view(), name='user_profile_page'),
 ]

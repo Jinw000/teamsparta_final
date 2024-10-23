@@ -19,3 +19,6 @@ class MainPageView(TemplateView):
 
 class ProfilePageView(TemplateView):
     template_name = 'accounts/profile.html'
+
+class ProfileUpdatePageView(TemplateView):
+    template_name = 'accounts/profile_update.html'
