@@ -93,7 +93,7 @@ python manage.py runserver
 실시간 양방향 통신이 가능한 Websocket 구현 방식의 채팅 기능 채택
 
  2. Docker를 활용한 서버 가상화
-![채널스.JPG](https://prod-files-secure.s3.us-west-2.amazonaws.com/83c75a39-3aba-4ba4-a792-7aefe4b07895/f4611c42-dcf7-42a8-8dfd-106d3d257a37/%EC%B1%84%EB%84%90%EC%8A%A4.jpg)
+
 
 >> 서버 호스트 (127.0.0.1.6379)를 사용하기 위해 Docker 활용
 
@@ -101,6 +101,7 @@ python manage.py runserver
  1. 특정 사용자 websocket 연결 생성
 >> JS에서 django로 던지는 것을 인지하여, Postman에서 access token을 발급하고, 
 특정 사용자의 websocket 연결 생성 가능하게 함.
+
 <script>
     const roomId = {{ room_id }};
     const accessToken = '...';  // Postman에서 발급받은 실제 액세스 토큰 값
@@ -163,6 +164,7 @@ python manage.py runserver
 ​
  
  2. 브라우저에서 새로 고침을 하여도, 채팅창 메시지가 저장되지 않는 버그가 발생
+    
     function addMessageToChatLog(sender, message, timestamp) {
         const messageElement = document.createElement("div");
         messageElement.classList.add("message");
