@@ -39,7 +39,7 @@ GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다.
 ![image](https://github.com/user-attachments/assets/d0829a34-efb8-44d1-9796-0d6ddd666b7e)
 
 ## ERD
-ERD 사진 추가해주세용
+[ERD 사진 추가해주세용](https://github.com/Jinw000/teamsparta_final/issues/9#issue-2609810408)
 
 ## 설치 및 실행 방법
 
