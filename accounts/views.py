@@ -59,6 +59,14 @@ class UserLogoutView(APIView):
         except Exception as e:
             return Response({"error": "로그아웃 중 오류가 발생했습니다."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        print("serializer.data: ",serializer.data)
+        return Response(serializer.data)
+
 # 인증 및 보안
 
 class UserSignupView(APIView):
