@@ -14,22 +14,44 @@ GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다.
 |      |  |                   |
 |      |  |                   |
 
+## 정의 및 약어
+
+ - LLM: Large Language Model
+
+ - Django: 파이썬 웹 프레임워크
+
+ - API: Application Programming Interface
+
+
+## 인터페이스 설계API 엔드 포인트
+
+- `/api/accounts/`: 사용자 관리
+- `/api/matches/`: 매칭 관리
+- `/api/chat/`: 채팅 관리
+
+## 주요 컴포넌트
+
+ - 사용자 관리 시스템
+ - 프로필 관리 시스템
+ - 매칭 엔진
+ - 채팅 시스템
+ - LLM
+
 ## 주요 기능
 
 - AI 기반 사용자 매칭
-- 실시간 채팅
-- 부적절한 언어 감지
-- 대화 주제 추천
+- 실시간 1:1 채팅
 - 프로필 관리
-- 관심사 기반 추천
+- 이메일 인증
+- 채팅 관리
 
 ## 기술 스택
 
-- Backend: Django, Django REST Framework
+- Backend: Django, Django REST Framework, Django channels, Websocket, Docker(서버 가상화)
 - Database: PostgreSQL
 - AI/ML: OpenAI GPT
 - 인증: JWT (JSON Web Tokens)
-- 배포: AWS
+- 배포: AWS, daphne, MobaXterm, gunicorn, nginx
 
 ## 보안
 - JWT 인증
@@ -41,6 +63,7 @@ GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다.
 
 ## ERD
 [![image](https://github.com/Jinw000/teamsparta_final/issues/9#issue-2609810408)](https://github.com/Jinw000/teamsparta_final/issues/10#issue-2609821045)
+
 
 ## 설치 및 실행 방법
 
@@ -64,5 +87,6 @@ pip install -r requirements.txt
 python manage.py migrate
 
 python manage.py runserver
+
 
 
