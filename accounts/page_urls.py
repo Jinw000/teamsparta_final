@@ -4,7 +4,7 @@ from .page_views import (
     LoginPageView,
     MainPageView,
     ProfilePageView,
-    ProfileUpdatePageView
+    ProfileUpdatePageView,
     HomePageView
 
 )

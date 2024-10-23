@@ -8,6 +8,7 @@ GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다.
 ## 팀 구성
 | **이름** | **역할**            | **기능**                          |
 |:------------:|--------------------------|----------------------------------|
+|   차민승   | 팀장 | 채팅 기능, 배포, 시연 영상 |
 |      |  |                   | 
 |   손진우   | 부팀장 | 회원기능, 매칭기능, 백엔드, LLM |
 |      |  |                   |
@@ -39,7 +40,7 @@ GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다.
 ![image](https://github.com/user-attachments/assets/d0829a34-efb8-44d1-9796-0d6ddd666b7e)
 
 ## ERD
-ERD 사진 추가해주세용
+![image](https://github.com/Jinw000/teamsparta_final/issues/9#issue-2609810408)
 
 ## 설치 및 실행 방법
 
@@ -47,18 +48,18 @@ ERD 사진 추가해주세용
 
 git clone https://github.com/Jinw000/teamsparta_final.git
 
-3. 가상 환경 생성 및 활성화
+2. 가상 환경 생성 및 활성화
 
 python -m venv venv
 
 source venv/bin/activate # Windows: venv\Scripts\activate
 
-5. 페키지 설치
+3. 페키지 설치
 
 pip install -r requirements.txt
 
 
-6. 데이터베이스 마이그레이션 및 서버 실행
+4. 데이터베이스 마이그레이션 및 서버 실행
 
 python manage.py migrate
 

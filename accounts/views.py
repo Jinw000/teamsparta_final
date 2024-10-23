@@ -14,7 +14,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from .utils import generate_verification_code, send_verification_email
 from django.http import JsonResponse
-import sentry_sdk
 
 # Create your views here.
 
@@ -92,7 +91,6 @@ class UserSignupView(APIView):
                     serializer.validated_data['email'], verification_code)
                 return JsonResponse({"message": "인증 코드가 이메일로 전송되었습니다."}, status=status.HTTP_200_OK)
             except Exception as e:
-                sentry_sdk.capture_exception(e)
                 return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return JsonResponse({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
