@@ -3,7 +3,7 @@ from accounts.models import User
 
 # 채팅방 모델
 class ChatRoom(models.Model):
-    name = models.CharField(max_length=100)  # 채팅방 이름
+    name = models.CharField(max_length=100)  # 채팅방 id
     participants = models.ManyToManyField(User, related_name='chatrooms')  # 채팅방 참가자들
     created_at = models.DateTimeField(auto_now_add=True)
 

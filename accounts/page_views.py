@@ -5,8 +5,8 @@ from django.views.generic import TemplateView
 from .models import User
 
 # url 리다이렉트
-def home(request):
-    return render(request, 'home.html')
+class HomePageView(TemplateView):
+    template_name = 'home.html'
 
 class SignupPageView(TemplateView):
     template_name = 'accounts/signup.html'

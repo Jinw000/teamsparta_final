@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+        .chat-container {
+            width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .chat-log {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: scroll;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-log .message {
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 10px;
+            width: fit-content;
+            max-width: 70%;
+        }
+        .chat-log .message.sent {
+            background-color: #DCF8C6;
+            margin-left: auto;
+            align-self: end;
+        }
+        .chat-log .message.received {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            align-self: start;
+        }
+        .chat-log .message time {
+            display: block;
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .chat-input {
+            display: flex;
+            margin-top: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .chat-input button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .chat-input button:hover { 
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <h2>채팅방 {{ room_id }}</h2>
+    <div class="chat-log" id="chat-log"></div>
+    <div class="chat-input">
+        <input type="text" id="chat-message-input" placeholder="메시지를 입력하세요" autocomplete="off">
+        <button id="chat-message-submit">전송</button>
+    </div>
+</div>
+
+<script>
+    const roomId = {{ room_id }};
+    const accessToken = localStorage.getItem('access_token'); // 브라우저 단위로 공유됨
+    const chatLog = document.getElementById("chat-log");
+    const chatMessageInput = document.getElementById("chat-message-input");
+    const chatMessageSubmit = document.getElementById("chat-message-submit");
+    const currentUser = {}; // 본인의 사용자명 (로그인 정보에서 가져올 수 있음)
+    const sender = document.getElementById('sender');
+
+    // 서버에서 받은 메시지를 채팅창에 추가하는 함수
+    function addMessageToChatLog(sender, message, timestamp) {
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message");
+        const timeString = new Date(timestamp).toLocaleTimeString(); // 받은 메시지의 시간을 표시
+        console.log(sender, message, timestamp);
+
+        // 보낸 사람과 받는 사람에 따라 스타일 적용
+        if (sender === currentUser) {
+            messageElement.classList.add("sent");
+        } else {
+            messageElement.classList.add("received");
+        }
+        console.log(sender, currentUser)
+        messageElement.innerHTML = `<strong>${sender}:</strong> ${message} <time>${timeString}</time>`;
+        chatLog.appendChild(messageElement);
+
+        // 스크롤을 아래로 자동 이동
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    // 서버에서 기존 메시지를 불러와 채팅창에 추가
+    fetch(`http://127.0.0.1:8000/api/chats/api/rooms/${roomId}/messages/`, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+})
+    .then(response => response.json())
+    .then(messages => {
+        messages.forEach(message => {
+            console.log(message);
+            addMessageToChatLog(message.sender_username, message.content, message.timestamp);
+        });
+    });
+
+        console.log(addMessageToChatLog.data);
+
+    // WebSocket을 사용해 실시간 메시지 수신
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + roomId + '/' + '?token=' + accessToken
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        addMessageToChatLog(data.sender, JSON.parse(data.message).message, Date.now());
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('WebSocket closed unexpectedly');
+    };
+
+    // 메시지 전송
+    chatMessageSubmit.onclick = function() {
+        const message = chatMessageInput.value;
+
+        if (message.trim() !== "") { // 빈 메시지는 전송하지 않음
+            chatSocket.send(JSON.stringify({
+                message
+            }));
+            chatMessageInput.value = '';  // 전송 후 입력란 초기화
+        }
+    };
+
+    // Enter 키로도 메시지 전송 가능
+    chatMessageInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            chatMessageSubmit.click();
+        }
+    });
+</script>
+
+</body>
+</html>
