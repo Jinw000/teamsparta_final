@@ -101,7 +101,7 @@ python manage.py runserver
 ## 트러블 슈팅
  1. 특정 사용자 websocket 연결 생성
     
->> JS에서 django로 던지는 것을 인지하여, Postman에서 access token을 발급하고, 
+: JS에서 django로 던지는 것을 인지하여, Postman에서 access token을 발급하고, 
 특정 사용자의 websocket 연결 생성 가능하게 함.
 
 >> ref. chat_room.html
@@ -109,12 +109,12 @@ python manage.py runserver
  
  2. 브라우저에서 새로 고침을 하여도, 채팅창 메시지가 저장되지 않는 버그가 발생
 ​
->> fetch 함수를 사용하여, 기존의 메시지를 불러와 채팅창에 추가 (ref. chat_room.html)
+: fetch 함수를 사용하여, 기존의 메시지를 불러와 채팅창에 추가 (ref. chat_room.html)
 
 
  3. channels 서버 호환 문제
 ​
->> localhost, 6379를 사용하기 위해 Docker를 활용하여 해결 (ref. gpting/settings.py)
+:localhost, 6379를 사용하기 위해 Docker를 활용하여 해결 (ref. gpting/settings.py)
 >> channels_layer
 
 
