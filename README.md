@@ -28,6 +28,11 @@ GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다. 사용자의 
 - 인증: JWT (JSON Web Tokens)
 - 배포: AWS
 
+## 보안
+- JWT 인증
+- 회원가입 이메일 인증 기능
+- 비밀번호 해시화
+
 ## 서비스 아키텍쳐
 ![image](https://github.com/user-attachments/assets/d0829a34-efb8-44d1-9796-0d6ddd666b7e)
 
@@ -57,7 +62,4 @@ python manage.py migrate
 
 python manage.py runserver
 
-## 보안
-- JWT 인증
-- 회원가입 이메일 인증 기능
-- 비밀번호 해시화
+
