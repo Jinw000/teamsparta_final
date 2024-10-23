@@ -53,4 +53,4 @@ python manage.py runserver
 ## 보안
 - JWT 인증
 - 회원가입 이메일 인증 기능
-- 비밀번호 해쉬화
+- 비밀번호 해시화
