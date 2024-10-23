@@ -32,17 +32,21 @@ GPTing은 AI 기술을 활용한 소개팅 서비스API 입니다. 사용자의 
 ## 설치 및 실행 방법
 
 1. 저장소 클론
+
 git clone https://github.com/Jinw000/teamsparta_final.git
 
-2. 가상 환경 생성 및 활성화
+3. 가상 환경 생성 및 활성화
+
 python -m venv venv
 source venv/bin/activate # Windows: venv\Scripts\activate
 
-3. 페키지 설치
+5. 페키지 설치
+
 pip install -r requirements.txt
 
 
-4. 데이터베이스 마이그레이션 및 서버 실행
+6. 데이터베이스 마이그레이션 및 서버 실행
+
 python manage.py migrate
 python manage.py runserver
 
