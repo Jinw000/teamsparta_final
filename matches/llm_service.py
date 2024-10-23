@@ -1,7 +1,8 @@
-from django.core.management.base import BaseCommand
+import openai
+from django.conf import settings
 from accounts.models import User
+from django.core.management.base import BaseCommand
 from matches.models import Match
-import openai  # OpenAI API를 사용한다고 가정
 
 class Command(BaseCommand):
     help = 'Generate matches using LLM recommendations'
@@ -18,6 +19,31 @@ class Command(BaseCommand):
                 )
 
     def get_llm_recommendations(self, user):
-        # LLM을 사용한 추천 로직 구현
-        # 이 부분은 실제 LLM 모델과 연동하여 구현해야 합니다
-        pass
+        # OpenAI API 키 설정
+        openai.api_key = settings.OPENAI_API_KEY
+        
+        # 예시 프롬프트: 사용자 매칭을 위한 적절한 프롬프트 작성
+        prompt = f"사용자 {user.username}에게 적합한 5명의 매칭 사용자 추천."
+
+        try:
+            # OpenAI API 호출
+            response = openai.Completion.create(
+                engine="text-davinci-003",  # 적절한 엔진 선택
+                prompt=prompt,
+                max_tokens=150,
+                n=5,  # 추천할 사용자 수
+                stop=None,
+                temperature=0.7
+            )
+
+            # 응답에서 추천 사용자 추출
+            recommendations = response.choices[0].text.strip().split('\n')
+            
+            # 추천된 사용자명을 User 객체로 변환 (사용자명이 반환된다고 가정)
+            recommended_users = User.objects.filter(username__in=recommendations)
+
+            return recommended_users
+
+        except Exception as e:
+            self.stderr.write(f"Error generating recommendations for {user.username}: {e}")
+            return []
