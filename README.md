@@ -94,9 +94,7 @@ python manage.py runserver
 실시간 양방향 통신이 가능한 Websocket 구현 방식의 채팅 기능 채택
 
  2. Docker를 활용한 서버 가상화
-
-
->> 서버 호스트 (127.0.0.1.6379)를 사용하기 위해 Docker 활용
+서버 호스트 (127.0.0.1.6379)를 사용하기 위해 Docker 활용
 
 ## 트러블 슈팅
  1. 특정 사용자 websocket 연결 생성
