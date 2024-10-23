@@ -109,7 +109,7 @@ python manage.py runserver
  
  2. 브라우저에서 새로 고침을 하여도, 채팅창 메시지가 저장되지 않는 버그가 발생
 ​
-: fetch 함수를 사용하여, 기존의 메시지를 불러와 채팅창에 추가 (ref. chat_room.html)
+ : fetch 함수를 사용하여, 기존의 메시지를 불러와 채팅창에 추가 (ref. chat_room.html)
 
 
  3. channels 서버 호환 문제
