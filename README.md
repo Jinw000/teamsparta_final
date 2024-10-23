@@ -121,31 +121,4 @@ python manage.py runserver
     
  - 프론트엔드 부분 수정
 chat-log에서 flex-direction: column, display: flex로 변경
-text-align에서 align-self: end, start로 변경
-        .chat-log {
-            width: 100%;
-            height: 400px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            overflow-y: scroll;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            display: flex;
-            flex-direction: column;
-        }
-        .chat-log .message {
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 10px;
-            width: fit-content;
-            max-width: 70%;
-        }
-        .chat-log .message.sent {
-            background-color: #DCF8C6;
-            margin-left: auto;
-            align-self: end;
-        }
-        .chat-log .message.received {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            align-self: start;
+>> ref. chat_room.html
